@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>给你的专属积分小屋 ❤️</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(145deg,#fff0f5,#ffe5ec 45%,#fff8f0);color:#4a3038}
+.app{max-width:520px;margin:auto;min-height:100vh;padding:20px 16px 90px}
+.hero{background:linear-gradient(135deg,#ff7f9f,#ff557e);color:white;border-radius:28px;padding:26px 22px;box-shadow:0 14px 35px #ff6d8a40;position:relative;overflow:hidden}
+.hero:after{content:"♥";position:absolute;right:-8px;bottom:-35px;font-size:150px;color:#ffffff18}
+.small{font-size:13px;opacity:.9}.hero h1{margin:5px 0;font-size:27px}.hero p{margin:7px 0 18px}
+.points{font-size:42px;font-weight:800;line-height:1}.unit{font-size:14px;font-weight:500;margin-left:5px}
+.progress{height:8px;background:#ffffff45;border-radius:99px;overflow:hidden;margin-top:15px}.progress span{display:block;height:100%;background:white;border-radius:99px;width:0}
+.tabs{display:flex;gap:8px;margin:18px 0}.tab{border:0;background:#fff;border-radius:15px;padding:11px 15px;color:#8d5b68;font-weight:700;box-shadow:0 5px 18px #c96b8620}.tab.active{background:#ff6689;color:#fff}
+.card{background:#fff;border-radius:22px;padding:18px;margin:12px 0;box-shadow:0 7px 25px #a94c6515}
+.card h3{margin:0 0 7px}.muted{color:#a17d87;font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.badge{background:#fff0f4;color:#ff557e;border-radius:99px;padding:6px 10px;font-size:12px;font-weight:700}
+button.action{border:0;border-radius:13px;padding:10px 14px;background:#ff6689;color:#fff;font-weight:700;cursor:pointer}button.action:disabled{background:#ddd;color:#999}
+.reward{display:flex;gap:14px;align-items:center}.emoji{width:54px;height:54px;border-radius:17px;background:#fff1f4;display:grid;place-items:center;font-size:28px}
+.bottom{position:fixed;bottom:0;left:0;right:0;padding:10px 16px;background:#ffffffdc;backdrop-filter:blur(12px);border-top:1px solid #f3dce3}
+.bottom div{max-width:488px;margin:auto;display:flex;justify-content:space-around;font-size:12px;color:#9c6c78}
+.empty{text-align:center;padding:25px;color:#aa8790}
+.modal{display:none;position:fixed;inset:0;background:#0005;align-items:center;justify-content:center;padding:20px}.modal.show{display:flex}.modalbox{background:#fff;border-radius:25px;padding:22px;max-width:420px;width:100%}.modalbox input{width:100%;padding:12px;border:1px solid #efd5dc;border-radius:12px;margin:10px 0 14px;font-size:16px}
+
+.login{position:fixed;inset:0;background:linear-gradient(145deg,#fff0f5,#ffdce7 45%,#fff8f0);display:flex;align-items:center;justify-content:center;padding:22px;z-index:99}
+.login.hide{display:none}.loginbox{width:min(430px,100%);background:#fff;border-radius:30px;padding:30px 24px;box-shadow:0 20px 60px #c84f7325;text-align:center}
+.couple{font-size:18px;color:#ff557e;font-weight:800}.heart{font-size:48px;margin:5px 0}.loginbox h1{margin:4px 0 8px;font-size:27px}.loginbox p{color:#a17d87;font-size:13px;margin-bottom:22px}
+.loginbox input{width:100%;padding:14px 16px;border:1px solid #f0d5dd;border-radius:14px;font-size:16px;outline:none;text-align:center}.loginbox input:focus{border-color:#ff6689}
+.loginbtn{width:100%;margin-top:12px;padding:14px;border:0;border-radius:14px;background:linear-gradient(135deg,#ff7f9f,#ff557e);color:#fff;font-size:16px;font-weight:800}
+.err{height:20px;color:#e94e70;font-size:12px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div class="login" id="login">
+  <div class="loginbox">
+    <div class="couple">林嘉钦 ❤️ 黎子雅</div>
+    <div class="heart">💗</div>
+    <h1>我们的爱情银行</h1>
+    <p>这是只属于我们两个人的小世界</p>
+    <input id="password" type="password" placeholder="请输入我们的专属密码" maxlength="20">
+    <button class="loginbtn" onclick="login()">进入我们的世界</button>
+    <div class="err" id="err"></div>
+    <div class="muted">🔒 私人专属 · 请勿分享给别人</div>
+  </div>
+</div>
+<div class="app">
+  <section class="hero">
+    <div class="small">♡ 女朋友专属 · Love Points</div><div class="small" id="loveDays" style="margin-top:4px"></div>
+    <h1>欢迎来到我们的积分小屋</h1>
+    <p>每一次开心、每一次陪伴，都值得被记下来。</p>
+    <div><span class="points" id="points">0</span><span class="unit">积分</span></div>
+    <div class="progress"><span id="bar"></span></div>
+    <div class="small" style="margin-top:7px">距离下一个奖励还差 <b id="need">100</b> 分</div>
+  </section>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('tasks',this)">赚积分</button>
+    <button class="tab" onclick="showTab('rewards',this)">兑换奖品</button>
+  </div>
+
+  <main id="content"></main>
+</div>
+<div class="bottom"><div><span>💗 专属空间</span><span>✨ 今天也要开心</span><span>🔒 只属于我们</span></div></div>
+
+<div class="modal" id="modal">
+ <div class="modalbox">
+  <h3>兑换确认 💕</h3><p id="modalText"></p>
+  <button class="action" onclick="confirmRedeem()">确认兑换</button>
+  <button class="action" style="background:#eee;color:#777;margin-left:7px" onclick="closeModal()">取消</button>
+ </div>
+</div>
+
+<script>
+
+const LOVE_PASSWORD = "1314";
+function login(){
+  const v=document.getElementById("password").value;
+  if(v===LOVE_PASSWORD){
+    sessionStorage.setItem("love_login","1");
+    document.getElementById("login").classList.add("hide");
+  }else{
+    document.getElementById("err").textContent="密码不对哦，再想想我们的专属密码 💕";
+  }
+}
+if(sessionStorage.getItem("love_login")==="1") document.getElementById("login").classList.add("hide");
+document.getElementById("password").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
+
+const tasks=[
+ {id:1,name:"主动说一句“我爱你”",desc:"今天认真表达一次喜欢",points:10,emoji:"💌"},
+ {id:2,name:"给我一个抱抱",desc:"拥抱至少 10 秒",points:15,emoji:"🫂"},
+ {id:3,name:"一起看一部电影",desc:"选一部我们都喜欢的电影",points:30,emoji:"🎬"},
+ {id:4,name:"今天夸我三次",desc:"真诚地说出三个优点",points:20,emoji:"🥰"},
+ {id:5,name:"安排一次约会",desc:"由你来决定时间和地点",points:50,emoji:"🌹"}
+];
+const rewards=[
+ {id:101,name:"奶茶一杯",desc:"你想喝什么，我请！",cost:30,emoji:"🧋"},
+ {id:102,name:"电影票 × 2",desc:"一起看一场电影",cost:100,emoji:"🎟️"},
+ {id:103,name:"晚餐约会",desc:"我负责安排一顿浪漫晚餐",cost:180,emoji:"🍝"},
+ {id:104,name:"神秘小礼物",desc:"不告诉你是什么，兑换就知道",cost:300,emoji:"🎁"},
+ {id:105,name:"一天公主待遇",desc:"今天你说了算 👑",cost:500,emoji:"👑"}
+];
+let points=Number(localStorage.getItem("love_points")||0);
+let done=JSON.parse(localStorage.getItem("love_done")||"[]");
+let pending=null;
+function save(){localStorage.setItem("love_points",points);localStorage.setItem("love_done",JSON.stringify(done))}
+function updateHero(){document.getElementById("points").textContent=points;let next=Math.ceil((points+1)/100)*100;let pct=(points%100);document.getElementById("bar").style.width=pct+"%";document.getElementById("need").textContent=next-points}
+function renderTasks(){
+ document.getElementById("content").innerHTML=tasks.map(t=>`
+ <div class="card"><div class="row"><div class="reward"><div class="emoji">${t.emoji}</div><div><h3>${t.name}</h3><div class="muted">${t.desc}</div></div></div><span class="badge">+${t.points}</span></div>
+ <div style="text-align:right;margin-top:13px"><button class="action" ${done.includes(t.id)?"disabled":""} onclick="complete(${t.id})">${done.includes(t.id)?"已领取 ✓":"完成任务"}</button></div></div>`).join("");
+}
+function renderRewards(){
+ document.getElementById("content").innerHTML=`
+ <div class="card"><h3>我的积分：${points} 💗</h3><div class="muted">攒够积分，就可以把喜欢的奖励带走。</div></div>`+
+ rewards.map(r=>`<div class="card"><div class="reward"><div class="emoji">${r.emoji}</div><div style="flex:1"><h3>${r.name}</h3><div class="muted">${r.desc}</div></div><span class="badge">${r.cost} 分</span></div>
+ <div style="text-align:right;margin-top:13px"><button class="action" ${points<r.cost?"disabled":""} onclick="askRedeem(${r.id})">${points<r.cost?"积分不足":"立即兑换"}</button></div></div>`).join("");
+}
+function complete(id){let t=tasks.find(x=>x.id===id);points+=t.points;done.push(id);save();function updateLoveDays(){
+  const start=new Date("2026-03-10T00:00:00");
+  const now=new Date();
+  const days=Math.max(0,Math.floor((now-start)/86400000)+1);
+  document.getElementById("loveDays").textContent="我们已经相爱 "+days+" 天 ❤️";
+}
+updateLoveDays(); updateHero(); renderTasks();alert(`完成啦！${t.emoji} +${t.points} 积分`)}
+function askRedeem(id){pending=rewards.find(x=>x.id===id);document.getElementById("modalText").textContent=`确定要用 ${pending.cost} 积分兑换「${pending.name}」吗？`;document.getElementById("modal").classList.add("show")}
+function closeModal(){document.getElementById("modal").classList.remove("show");pending=null}
+function confirmRedeem(){if(!pending||points<pending.cost)return;points-=pending.cost;save();closeModal();updateHero();renderRewards();alert(`兑换成功！${pending.emoji} ${pending.name} 已加入“待兑现”清单 💕`)}
+function showTab(tab,el){document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));el.classList.add("active");tab==="tasks"?renderTasks():renderRewards()}
+function updateLoveDays(){
+  const start=new Date("2026-03-10T00:00:00");
+  const now=new Date();
+  const days=Math.max(0,Math.floor((now-start)/86400000)+1);
+  document.getElementById("loveDays").textContent="我们已经相爱 "+days+" 天 ❤️";
+}
+updateLoveDays(); updateHero(); renderTasks();
+</script>
+</body>
+</html>
